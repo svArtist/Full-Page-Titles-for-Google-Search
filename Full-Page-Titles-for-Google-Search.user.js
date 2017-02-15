@@ -1,9 +1,10 @@
 // ==UserScript==
-// @name        Retrieve Full Page Titles in Google Search
-// @version     1.3
-// @namespace   Google
-// @author      Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
-// @description Fill the page link titles with the full respective page titles
+// @name		Retrieve Full Page Titles in Google Search
+// @version		1.4
+// @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
+// @namespace	Google
+// @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
+// @description	Fill the page link titles with the full respective page titles
 // @icon64URL	http://imgur.com/1J34GZD.png
 // @include		/https?:\/\/(www\.)?google\.[a-z\.]{2,6}\/search\?((?!tbm=isch).)*$/
 // @require 	http://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js
