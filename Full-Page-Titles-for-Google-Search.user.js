@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
-// @version		1.4
+// @version		1.5
 // @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
