@@ -19,7 +19,7 @@ var settings = {};
 settings.applyToLinkText = false;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
 settings.rex = "<title([^>]*)>([^<]+)<";	// Default = "<title([^>]*)>([^<]+)<". Regex to find the title of a page. If you find a better way, please let me know.
 settings.dontLookupExtensions = [".pdf"];	// Default = [".pdf"]. Exclude from lookup. PDFs are generally downloaded as files, giving you a popup. Excluding ".pdf" is recommended.
-settings.verbose = 1;						// Default = 1. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
+settings.verbosity = 0;						// Default = 0. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
 settings.keepSettings = true;				// Default = TRUE. TRUE = Try to save & load settings in browser's localStorage. FALSE = settings will be overweitten on update.
 settings.warnOnChange = true;				// Default = TRUE. TRUE = When changes are made but the Version number stays the same (assume changes by user), ask to save and apply the settings. FALSE = Automatically apply changes.
 
@@ -36,7 +36,7 @@ var successRequests = 0;
 var failedRequests = 0;
 var msgPrefix = "Full Page Titles in Google Search:\n";
 
-clog("Verbosity level: " + settings.verbose, 1);
+clog("Verbosity level: " + settings.verbosity, 1);
 
 if(localStorage){
     var oldVersion = myVersion;
@@ -50,7 +50,7 @@ if(localStorage){
             settingsLoad();
     if(settings.keepSettings === true){
         if(oldVersion == myVersion && settingsChanged() && settings.warnOnChange){
-            if (!confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf <ou didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
+            if (!confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf you didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
                 settingsLoad();
         }
         settingsSave();
@@ -93,14 +93,17 @@ function settingsChanged(){
 }
 
 
+openRequests = 0;
+successRequests = 0;
+failedRequests = 0;
+allinks = 0;
 function updatePage(){
-    openRequests = 0;
-    successRequests = 0;
-    failedRequests = 0;
-    allinks = 0;
     clog("Walking through Links...", 2);
-	$("#ires .g .rc h3.r a:not([titled])").each(function(){
+	$("#ires .g .rc h3.r a:not(.done)").each(function(){
         allinks ++;
+        disableUpdate = true;
+		$(this).addClass("done");
+        disableUpdate = false;
         clog("Looking at Link '" + this.href + "' (" + this.innerHTML + ")", 3);
 		if(this.text.substr(this.text.length-3)=="...")
 			getTitle(this);
@@ -126,7 +129,7 @@ function getTitle(el){
             var mrex = new RegExp(settings.rex, "i");
 			var tit = mrex.exec(res.response);
 			if(tit === undefined || tit === null){
-                clog("No title found in response for " + el.href, 2);
+                clog({error: "No title found in response", page: el.href}, 2);
                 report("fail");
 				return;
             }
@@ -136,7 +139,6 @@ function getTitle(el){
                 el.innerHTML = el.title;
                 $(el).parent().css("overflow", "visible");
             }
-			$(el).attr("titled", "true");
             report("success");
 			disableUpdate = false;
 		},
@@ -166,7 +168,7 @@ function report(status){
 }
 
 function clog(o, l=2){
-    if(settings.verbose >= l)
+    if(settings.verbosity >= l)
         console.log(o);
 }
 
@@ -198,7 +200,6 @@ function updater(t = 1000){
 	}
 	else
 	{
-        clog("Updater called but busy",3);
 		updaterequest = true;
 	}
 }
@@ -206,38 +207,38 @@ function updater(t = 1000){
 var bodyObserver;
 
 function observeResults(){
-	clog("observing", 3);
+	clog("observing contents", 3);
     updater();
 	resultsObserver = new MutationObserver(function(){
         clog("content changed",3);
         updater();
     });
-	resultsObserver.observe($("#ires .g .rc")[0], {subtree: true, childList: true});
-	if(bodyObserver !== false)
-		bodyObserver.disconnect();
+	resultsObserver.observe($("#ires")[0], {subtree: true, childList: true});
+	// if(bodyObserver !== undefined)
+	// 	bodyObserver.disconnect();
 }
 
 var oloc = window.location.href;
 function checkLocation(){
 	if(window.location.href != oloc){
-        clog("Window Location has changed (dynamic loading)",2);
+        clog("Window Location has changed (dynamic loading)",3);
 		oloc = window.location.href;
 		prepareObservers();
 	}
 }
 
 function prepareObservers(){
-    if($("#ires .g .rc").length>0){
+    if($("#ires").length>0){
         observeResults();
     }
     else{
-        bodyObserver = new MutationObserver(function(mutations){
+        bodyObserver = new MutationObserver(function(){
             if(disableUpdate || !idle){
                 return;
             }
-            if($("#ires .g .rc").length>0)
+            if($("#ires").length>0)
             {
-                clog("content found through body observer");
+                clog("content found through body observer",3);
                 observeResults();
             }
         });
