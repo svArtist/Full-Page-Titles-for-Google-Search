@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
-// @version		1.8
+// @version		1.9
 // @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
@@ -42,51 +42,57 @@ clog("Verbosity level: " + settings.verbosity, 1);
 
 if(localStorage){
     var oldVersion = myVersion;
+    var storSettings = JSON.parse(localStorage.fptSettings);
+    clog("Old Version: " + localStorage.fptVersion);
+    clog(localStorage.fptSettings);
     if(localStorage.fptVersion !== undefined)
         var oldVersion = localStorage.fptVersion;
     else
         settingsSave();
 
     if(oldVersion != myVersion)
-        if(localStorage.fptSettings.keepSettings === true)
+        if(storSettings.keepSettings === true)
             settingsLoad();
     if(settings.keepSettings === true){
-        if(oldVersion == myVersion && settingsChanged() && settings.warnOnChange){
-            if (!confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf you didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
+        if(oldVersion == myVersion && settingsChanged()){
+            if(settings.warnOnChange && !confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf you didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
                 settingsLoad();
         }
         settingsSave();
     }
-    else{
-        if(settings.keepSettings === true)
-            clog("Settings are set to work from localStorage, but localStorage is not available!\nMake sure this script has access to localStorage, or turn off this feature in the settings section of this script.",1);
-            alert(msgPrefix + "Settings are set to work from localStorage, but localStorage is not available!\nMake sure this script has access to localStorage, or turn off this feature in the settings section of this script.");
-    }
 
-    var tob = JSON.parse(localStorage.fptSettings);
     var complete = true;
     for(var key in settingsSafety){
         if(settingsSafety.hasOwnProperty(key)){
-           if(tob[key] === undefined || tob[key] === null){
+           if(storSettings[key] === undefined || storSettings[key] === null){
                clog("Added new settings object: " + key, 3);
-               tob[key] = settingsSafety[key];
+               storSettings[key] = settingsSafety[key];
                complete = false;
            }
         }
     }
     if(!complete){
-        localStorage.fptSettings = JSON.stringify(tob);
+        localStorage.fptSettings = JSON.stringify(storSettings);
+    }
+}
+else
+{
+    if(settings.keepSettings === true){
+        clog("Settings are set to work from localStorage, but localStorage is not available!\nMake sure this script has access to localStorage, or turn off this feature in the settings section of this script.",1);
+        alert(msgPrefix + "Settings are set to work from localStorage, but localStorage is not available!\nMake sure this script has access to localStorage, or turn off this feature in the settings section of this script.");
     }
 }
 
 function settingsSave(){
     localStorage.fptSettings = JSON.stringify(settings);
     localStorage.fptVersion = oldVersion = myVersion;
+    clog("Settings saved",3);
 }
 function settingsLoad(){
     if(localStorage.fptSettings === undefined)
         return;
     settings = JSON.parse(localStorage.fptSettings);
+    clog("Settings loaded",3);
 }
 function settingsChanged(){
     if(localStorage.fptSettings === undefined || localStorage.fptSettings != JSON.stringify(settings))
@@ -126,7 +132,7 @@ function getTitle(el){
 	GM_xmlhttpRequest({
 		url: el.href,
 		method: "GET",
-		timeout: 15000, //15 seconds timeout
+		timeout: 30000, //30 seconds timeout
 		onload: function(res){
             var mrex = new RegExp(settings.rex, "i");
 			var tit = mrex.exec(res.response);
@@ -254,5 +260,5 @@ if(settings.useTimerInsteadOfObserver === true){
 }
 else{
 	setInterval(checkLocation, 1000);
-	prepareObservers();	
+	prepareObservers();
 }
