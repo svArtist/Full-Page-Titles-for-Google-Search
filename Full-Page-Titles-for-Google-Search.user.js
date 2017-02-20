@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
-// @version		1.9
+// @version		1.10
 // @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
@@ -36,14 +36,14 @@ var updaterequest = false;
 var openRequests = 0;
 var successRequests = 0;
 var failedRequests = 0;
-var msgPrefix = "Full Page Titles in Google Search:\n";
+var msgPrefix = "Full Page Titles in Google Search v" + myVersion + ":\n";
 
 clog(msgPrefix + "Verbosity level: " + settings.verbosity, 1);
 
 if(localStorage){
     var oldVersion = myVersion;
     var storSettings = JSON.parse(localStorage.fptSettings);
-    clog("Old Version: " + localStorage.fptVersion,3);
+    clog(msgPrefix + "Old Version: " + localStorage.fptVersion,3);
     clog(localStorage.fptSettings,3);
     if(localStorage.fptVersion !== undefined)
         var oldVersion = localStorage.fptVersion;
