@@ -38,8 +38,6 @@ var successRequests = 0;
 var failedRequests = 0;
 var msgPrefix = "Full Page Titles in Google Search v" + myVersion + ":\n";
 
-clog(msgPrefix + "Verbosity level: " + settings.verbosity, 1);
-
 if(localStorage){
     var oldVersion = myVersion;
     var storSettings = JSON.parse(localStorage.fptSettings);
@@ -81,6 +79,8 @@ else
         alert(msgPrefix + "Settings are set to work from localStorage, but localStorage is not available!\nMake sure this script has access to localStorage, or turn off this feature in the settings section of this script.");
     }
 }
+
+clog(msgPrefix + "Verbosity level: " + settings.verbosity, 1);
 
 function settingsSave(){
     localStorage.fptSettings = JSON.stringify(settings);
