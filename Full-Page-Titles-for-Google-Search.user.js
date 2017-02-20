@@ -110,7 +110,7 @@ function updatePage(){
 		if(this.text.substr(this.text.length-3)=="...")
 			getTitle(this);
 	});
-    clog(openRequests + " of " + allinks + " links need to be checked.", 2);
+    clog(openRequests + " of " + allinks + " links are being checked.", 2);
 }
 
 function getTitle(el){
