@@ -38,21 +38,20 @@ var successRequests = 0;
 var failedRequests = 0;
 var msgPrefix = "Full Page Titles in Google Search:\n";
 
-clog("Verbosity level: " + settings.verbosity, 1);
+clog(msgPrefix + "Verbosity level: " + settings.verbosity, 1);
 
 if(localStorage){
     var oldVersion = myVersion;
     var storSettings = JSON.parse(localStorage.fptSettings);
-    clog("Old Version: " + localStorage.fptVersion);
-    clog(localStorage.fptSettings);
+    clog("Old Version: " + localStorage.fptVersion,3);
+    clog(localStorage.fptSettings,3);
     if(localStorage.fptVersion !== undefined)
         var oldVersion = localStorage.fptVersion;
     else
         settingsSave();
 
-    if(oldVersion != myVersion)
-        if(storSettings.keepSettings === true)
-            settingsLoad();
+    if(oldVersion != myVersion && storSettings.keepSettings === true)
+        settingsLoad();
     if(settings.keepSettings === true){
         if(oldVersion == myVersion && settingsChanged()){
             if(settings.warnOnChange && !confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf you didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
