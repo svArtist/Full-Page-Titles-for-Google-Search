@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
-// @version		1.6
+// @version		1.7
 // @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
@@ -16,12 +16,14 @@
 
 // SETTINGS:
 var settings = {};
-settings.applyToLinkText = false;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
+settings.applyToLinkText = true;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
 settings.rex = "<title([^>]*)>([^<]+)<";	// Default = "<title([^>]*)>([^<]+)<". Regex to find the title of a page. If you find a better way, please let me know.
 settings.dontLookupExtensions = [".pdf"];	// Default = [".pdf"]. Exclude from lookup. PDFs are generally downloaded as files, giving you a popup. Excluding ".pdf" is recommended.
 settings.verbosity = 0;						// Default = 0. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
 settings.keepSettings = true;				// Default = TRUE. TRUE = Try to save & load settings in browser's localStorage. FALSE = settings will be overweitten on update.
 settings.warnOnChange = true;				// Default = TRUE. TRUE = When changes are made but the Version number stays the same (assume changes by user), ask to save and apply the settings. FALSE = Automatically apply changes.
+settings.useTimerInsteadOfObserver = true;	// Default = TRUE. TRUE = Use a simple timer to check for links. Less likely to overlook updates, but will be running constantly.
+settings.checkTimer = 1000;					// Default = 1000. Interval for checking Links in milliseconds. Only relevant if useTimerInsteadOfObserver == TRUE.
 
 // Script vars, best don't touch
 var myVersion = GM_info.script.version;
@@ -225,6 +227,7 @@ function checkLocation(){
 		oloc = window.location.href;
 		prepareObservers();
 	}
+	updater();
 }
 
 function prepareObservers(){
@@ -246,5 +249,10 @@ function prepareObservers(){
     }
 }
 
-setInterval(checkLocation, 1000);
-prepareObservers();
+if(settings.useTimerInsteadOfObserver === true){
+	setInterval(updatePage, settings.checkTimer);
+}
+else{
+	setInterval(checkLocation, 1000);
+	prepareObservers();	
+}
