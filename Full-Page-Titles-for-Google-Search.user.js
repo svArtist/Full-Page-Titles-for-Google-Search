@@ -16,7 +16,7 @@
 
 // SETTINGS:
 var settings = {};
-settings.applyToLinkText = true;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
+settings.applyToLinkText = false;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
 settings.rex = "<title([^>]*)>([^<]+)<";	// Default = "<title([^>]*)>([^<]+)<". Regex to find the title of a page. If you find a better way, please let me know.
 settings.dontLookupExtensions = [".pdf"];	// Default = [".pdf"]. Exclude from lookup. PDFs are generally downloaded as files, giving you a popup. Excluding ".pdf" is recommended.
 settings.verbosity = 0;						// Default = 0. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
