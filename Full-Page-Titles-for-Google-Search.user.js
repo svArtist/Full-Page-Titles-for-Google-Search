@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
-// @version		1.7
+// @version		1.8
 // @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
@@ -110,7 +110,7 @@ function updatePage(){
 		if(this.text.substr(this.text.length-3)=="...")
 			getTitle(this);
 	});
-    clog(openRequests + " of " + allinks + " links need to be checked.", 1);
+    clog(openRequests + " of " + allinks + " links need to be checked.", 2);
 }
 
 function getTitle(el){
