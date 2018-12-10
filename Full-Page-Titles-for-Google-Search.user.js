@@ -138,7 +138,8 @@ function getTitle(el){
 			$(el).css("background-color", "#efe");
 			el.title = unEscapeHtml(tit[2]);
             if(settings.applyToLinkText){
-                el.innerHTML = el.title;
+                $(el).find("h3").html(el.title);
+                $(el).css("white-space", "nowrap");
                 $(el).parent().css("overflow", "visible");
             }
 			$(el).attr("titled", "true");
