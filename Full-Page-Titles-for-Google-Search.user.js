@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
 // @version		1.6
+// @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
 // @description	Fill the page link titles with the full respective page titles
@@ -18,7 +19,7 @@ var settings = {};
 settings.applyToLinkText = false;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
 settings.rex = "<title([^>]*)>([^<]+)<";	// Default = "<title([^>]*)>([^<]+)<". Regex to find the title of a page. If you find a better way, please let me know.
 settings.dontLookupExtensions = [".pdf"];	// Default = [".pdf"]. Exclude from lookup. PDFs are generally downloaded as files, giving you a popup. Excluding ".pdf" is recommended.
-settings.verbose = 3;						// Default = 1. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
+settings.verbose = 1;						// Default = 1. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
 settings.keepSettings = true;				// Default = TRUE. TRUE = Try to save & load settings in browser's localStorage. FALSE = settings will be overweitten on update.
 settings.warnOnChange = true;				// Default = TRUE. TRUE = When changes are made but the Version number stays the same (assume changes by user), ask to save and apply the settings. FALSE = Automatically apply changes.
 
@@ -50,7 +51,7 @@ if(localStorage){
             settingsLoad();
     if(settings.keepSettings === true){
         if(oldVersion == myVersion && settingsChanged() && settings.warnOnChange){
-            if (!confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf you didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
+            if (!confirm(msgPrefix + "Settings have been changed, although the Script Version (" + oldVersion + ") has stayed the same.\nDo you want to save those settings to localStorage and use them?\nIf <ou didn't manually make new changes, localStorage has probably been lost. Simply click 'OK' to save the settings again.'"))
                 settingsLoad();
         }
         settingsSave();
@@ -102,7 +103,6 @@ function updatePage(){
 	$(linkmatch + ":not([titled])").each(function(){
         allinks ++;
         clog("Looking at Link '" + $(this).parent()[0].href + "' (" + this.innerHTML + ")", 3);
-		console.log(this);
 		if(this.textContent.substr(this.textContent.length-3)=="..."){
 			clog("needs checking");
 			$(this).parent().css("background-color", "#fee");
@@ -135,8 +135,8 @@ function getTitle(el){
 				return;
             }
 			disableUpdate = true;
-			el.title = unEscapeHtml(tit[2]);
 			$(el).css("background-color", "#efe");
+			el.title = unEscapeHtml(tit[2]);
             if(settings.applyToLinkText){
                 el.innerHTML = el.title;
                 $(el).parent().css("overflow", "visible");
