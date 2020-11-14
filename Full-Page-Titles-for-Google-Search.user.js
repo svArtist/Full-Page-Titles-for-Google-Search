@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		Retrieve Full Page Titles in Google Search
-// @version		1.6
-// @downloadURL	https://github.com/svArtist/Full-Page-Titles-for-Google-Search/raw/master/Full-Page-Titles-for-Google-Search.user.js
+// @version		1.8
+// @downloadURL	https://www.benjamin-philipp.com/fff/userScripts/Full-Page-Titles-for-Google-Search.user.js
 // @namespace	Google
 // @author		Benjamin Philipp <benjamin_philipp [at - please don't spam] gmx.de>
 // @description	Fill the page link titles with the full respective page titles
@@ -14,23 +14,27 @@
 // @connect		*
 // ==/UserScript==
 
+/* jshint loopfunc: true, -W027 */
+/* eslint-disable curly, no-redeclare */
+/* eslint no-trailing-spaces: off */
+/* globals $, GM_info, GM_setValue, GM_getValue, GM_xmlhttpRequest, GM.setValue, GM.getValue, GM.xmlhttpRequest, escape, uneval */
+
 // SETTINGS:
 var settings = {};
-settings.applyToLinkText = false;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
+settings.applyToLinkText = true;			// Default = FALSE. TRUE = change innerHTML of links and applying overflow: visible to parent; false = only apply to Link Title (for mouseover Tooltip)
 settings.rex = "<title([^>]*)>([^<]+)<";	// Default = "<title([^>]*)>([^<]+)<". Regex to find the title of a page. If you find a better way, please let me know.
 settings.dontLookupExtensions = [".pdf"];	// Default = [".pdf"]. Exclude from lookup. PDFs are generally downloaded as files, giving you a popup. Excluding ".pdf" is recommended.
-settings.verbose = 1;						// Default = 1. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
+settings.verbose = 3;						// Default = 1. 0 = no logs; 1 = reports on link counts; 2 = +statuses of link checks; 3 = +Details
 settings.keepSettings = true;				// Default = TRUE. TRUE = Try to save & load settings in browser's localStorage. FALSE = settings will be overweitten on update.
 settings.warnOnChange = true;				// Default = TRUE. TRUE = When changes are made but the Version number stays the same (assume changes by user), ask to save and apply the settings. FALSE = Automatically apply changes.
 
 // Script vars, best don't touch
 var myVersion = GM_info.script.version;
 var settingsSafety = settings;
-var linkmatch = "#ires .g .rc .r a h3";
+var linkmatch = "#search #rso .g .rc a h3";
 var resultsObserver;
 var idle = true;
 var idletimer;
-var disableUpdate = false;
 var updaterequest = false;
 var openRequests = 0;
 var successRequests = 0;
@@ -134,7 +138,6 @@ function getTitle(el){
                 report("fail");
 				return;
             }
-			disableUpdate = true;
 			$(el).css("background-color", "#efe");
 			el.title = unEscapeHtml(tit[2]);
             if(settings.applyToLinkText){
@@ -144,7 +147,6 @@ function getTitle(el){
             }
 			$(el).attr("titled", "true");
             report("success");
-			disableUpdate = false;
 		},
 		onerror: function(res){
 			clog({error: "Error loading page", page: el.href}, 2);
@@ -209,47 +211,4 @@ function updater(t = 1000){
 	}
 }
 
-var bodyObserver;
-
-function observeResults(){
-	clog("observing", 3);
-    updater();
-	resultsObserver = new MutationObserver(function(){
-        clog("content changed",3);
-        updater();
-    });
-	resultsObserver.observe($("#ires .g .rc")[0], {subtree: true, childList: true});
-	if(bodyObserver !== false)
-		bodyObserver.disconnect();
-}
-
-var oloc = window.location.href;
-function checkLocation(){
-	if(window.location.href != oloc){
-        clog("Window Location has changed (dynamic loading)",2);
-		oloc = window.location.href;
-		prepareObservers();
-	}
-}
-
-function prepareObservers(){
-    if($("#ires .g .rc").length>0){
-        observeResults();
-    }
-    else{
-        bodyObserver = new MutationObserver(function(mutations){
-            if(disableUpdate || !idle){
-                return;
-            }
-            if($("#ires .g .rc").length>0)
-            {
-                clog("content found through body observer");
-                observeResults();
-            }
-        });
-        bodyObserver.observe($("body")[0], {subtree: true, childList: true});
-    }
-}
-
-setInterval(checkLocation, 1000);
-prepareObservers();
+setInterval(updater, 2000);
